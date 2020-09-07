@@ -1,0 +1,16 @@
+{
+  "name": "unity.localization",
+  "displayName": "Localization",
+  "version": "0.0.1",
+  "unity": "2019.1",
+  "keywords": [
+    "lang",
+    "localization",
+    "language"
+  ],
+  "category": "Unity",
+  "description": "Localization, Multi Language",
+  "dependencies": {
+    "unity.guiextensions": "0.0.1"
+  }
+}

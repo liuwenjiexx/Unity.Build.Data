@@ -1,0 +1,1 @@
+[{"ID":1,"_String":"abc","_Int8":0,"_Int16":0,"_Int32":123,"_Int64":2,"_UInt8":0,"_UInt16":0,"_UInt32":0,"_UInt64":0,"Float32":10,"Float64":0,"_Bool":false,"IntArray":[1,2,3],"_Book":{"Name":"Unity入门","Category":1},"Books":[{"Name":"Unity入门","Category":1},{"Name":"C#语言入门","Category":2}],"ServerField":"server field"}]

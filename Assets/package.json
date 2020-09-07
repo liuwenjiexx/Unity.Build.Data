@@ -1,0 +1,14 @@
+{
+  "name": "unity.build.data",
+  "displayName": "Build Data",
+  "version": "0.0.1",
+  "unity": "2019.1",
+  "description": "",
+  "keywords": [
+    "unity",
+    "data",
+    "build"
+  ],
+  "category": "Unity",
+  "repoPackagePath": "../UnityPackages"
+}

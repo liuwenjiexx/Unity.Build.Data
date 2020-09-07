@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<linker>
+  <!--https://docs.unity3d.com/Manual/IL2CPP-BytecodeStripping.html-->
+  <!--
+错误消息:
+Could not produce class with ID xxx. This could be caused by a class being stripped from the build even though it is needed. Try disabling 'Strip Engine Code' in Player Settings.
+ID 查询:
+https://docs.unity3d.com/Manual/ClassIDReference.html
+-->
+
+  <assembly fullname="Unity.GUIExtensions" preserve="all"/>
+</linker>

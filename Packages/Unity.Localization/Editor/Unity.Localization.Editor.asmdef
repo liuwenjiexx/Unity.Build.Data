@@ -1,0 +1,19 @@
+{
+    "name": "Unity.Localization.Editor",
+    "references": [
+        "GUID:38edba7c2a9152a42bcdb06d593885c9",
+        "GUID:e52d4e5afa790e6448eb99cfe5592759",
+        "GUID:b8306774212333b4fb94b9f30efac8d0"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

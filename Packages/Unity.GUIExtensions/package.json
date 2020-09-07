@@ -1,0 +1,14 @@
+{
+  "name": "unity.guiextensions",
+  "displayName": "GUI Extensions",
+  "version": "0.0.1",
+  "unity": "2019.1",
+  "description": "GUI Extensions",
+  "keywords": [
+    "gui"
+  ],
+  "category": "Unity",
+  "dependencies": {
+  },
+  "repoPackagePath": "../UnityPackages"
+}

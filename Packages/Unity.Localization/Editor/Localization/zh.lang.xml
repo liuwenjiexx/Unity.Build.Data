@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<localization xmlns="urn:schema-localization">
+  <string key="Create New">新建</string>
+  <string key="New Key">新名称</string>
+  <string key="Delete">删除</string>
+  <string key="Edit">编辑</string>
+  <string key="None">无</string>
+  <string key="Localization">本地化</string>
+  <string key="type_string">字符串</string>
+  <string key="Selected">系统语言</string>
+  <string key="Current">当前</string>
+  <string key="CurrentCulture">区域</string>
+  <string key="CurrentUICulture">界面区域</string>
+  <string key="systemLanguage">系统语言</string>
+  <string key="Default">删除</string>
+  <string key="Format">格式化</string>
+  <string key="Key">键</string>
+  <string key="MissingKeyError">丢失键 &lt;{0}&gt;</string>
+</localization>

@@ -1,0 +1,12 @@
+.vs
+src/.vs
+/Assets/Plugins/gen/
+/Library
+/Temp
+/*.sln
+/*.csproj
+gen/
+/ProjectSettings/*
+/Build
+/Logs/
+/obj/

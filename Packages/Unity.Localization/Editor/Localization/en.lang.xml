@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<localization xmlns="urn:schema-localization">
+  <string key="New Key">New Key</string>
+  <string key="Delete">Delete</string>
+  <string key="Edit">Edit</string>
+  <string key="None">None</string>
+  <string key="Localization">Localization</string>
+  <string key="type_string">string</string>
+  <string key="Selected">Selected</string>
+  <string key="Current">Current</string>
+  <string key="CurrentUICulture">CurrentUICulture</string>
+  <string key="CurrentCulture">CurrentCulture</string>
+  <string key="systemLanguage">systemLanguage</string>
+  <string key="Default">Default</string>
+  <string key="Create New">Create New</string>
+  <string key="Key">Key</string>
+  <string key="Format">Format</string>
+  <string key="MissingKeyError">Missing Key &lt;{0}&gt;</string>
+</localization>
