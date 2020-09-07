@@ -983,7 +983,7 @@ namespace UnityEditor.Localizations
                 if (translateButtonStyle == null)
                 {
                     translateButtonStyle = new GUIStyle("button");
-                    Debug.Log(translateButtonStyle.padding);
+                    //Debug.Log(translateButtonStyle.padding);
                     translateButtonStyle.padding = new RectOffset(4, 5, 3, 2);
                     //translateButtonStyle.margin = new RectOffset();
                     translateButtonStyle.fontSize -= 2;

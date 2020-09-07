@@ -8,6 +8,8 @@ Unity Package
 
 ![](Assets/README/Settings.PNG)
 
+![](Assets/README/ExcelFormat.PNG)
+
 
 
 ## 快速使用

@@ -4,9 +4,11 @@
 
 
 
-## 配置界面
+## 预览
 
 ![](README/Settings.PNG)
+
+![](README/ExcelFormat.PNG)
 
 
 
