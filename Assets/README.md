@@ -86,12 +86,12 @@ static void ConfigurationData()
 
 ## 表结构
 
-| 1    | 序号 | 姓名   | 数组   | 注释     |
-| ---- | ---- | ------ | ------ | -------- |
-| 2    | ID   | Name   | _Array | Comment  |
-| 3    | int  | string | int[]  | string   |
-| 4    | key  |        |        |          |
-| 5    | 1    | Test   | 1,2,3  | 张三用户 |
+| 1    | 序号 | 姓名   | 数组    | 注释     |
+| ---- | ---- | ------ | ------- | -------- |
+| 2    | ID   | Name   | _Array  | Comment  |
+| 3    | int  | string | int[]   | string   |
+| 4    | key  |        |         |          |
+| 5    | 1    | Test   | 1\|2\|3 | 张三用户 |
 
 行说明
 
