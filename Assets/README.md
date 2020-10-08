@@ -86,13 +86,12 @@ static void ConfigurationData()
 
 ## 表结构
 
-| 1    | 序号          | 姓名   | 数组   | 注释     |
-| ---- | ------------- | ------ | ------ | -------- |
-| 2    | ID            | Name   | _Array | Comment  |
-| 3    | int           | string | int[]  | string   |
-| 4    | key           |        |        |          |
-| 5    | client/server | client | client | exclude  |
-| 6    | 1             | Test   | 1,2,3  | 张三用户 |
+| 1    | 序号 | 姓名   | 数组   | 注释     |
+| ---- | ---- | ------ | ------ | -------- |
+| 2    | ID   | Name   | _Array | Comment  |
+| 3    | int  | string | int[]  | string   |
+| 4    | key  |        |        |          |
+| 5    | 1    | Test   | 1,2,3  | 张三用户 |
 
 行说明
 
@@ -112,13 +111,9 @@ static void ConfigurationData()
 
    可选，字段定义，包含（key，enum，struct 等）
 
-6. **~~Exclude~~**
-
-   可选，排除列，正则表达式格式
-
 7. **Data**
 
-   可选，数据开始行，如果未设置则默认最大索引的下一行
+   可选，数据开始行索引，如果未设置则默认最大索引的下一行
 
 
 
@@ -232,11 +227,11 @@ keyword([parameter])
 
 - client
 
-  设置 `client` 标签
+  设置 `client` 标签，等同于 tag(client)
 
 - server
 
-  设置 `server` 标签
+  设置 `server` 标签，等同于 tag(server)
 
 - exclude
 
