@@ -6,7 +6,8 @@ src/.vs
 /*.sln
 /*.csproj
 gen/
-/ProjectSettings/*
+/ProjectSettings/*.asset
 /Build
 /Logs/
 /obj/
+/ProjectSettings/ProjectVersion.txt
