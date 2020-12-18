@@ -6,9 +6,21 @@ Unity Package
 
 ## 配置界面
 
-![](Assets/README/Settings.PNG)
+![](Assets/Plugins/Unity.Build.Data/README/Settings.PNG)
 
-![](Assets/README/ExcelFormat.PNG)
+![](Assets/Plugins/Unity.Build.Data/README/ExcelFormat.PNG)
+
+
+
+## manifest.json
+
+```
+"unity.guiextensions": "https://github.com/liuwenjiexx/Unity.GuiExtensions.git",
+"unity.localization": "https://github.com/liuwenjiexx/Unity.Localization.git?path=/Assets/Plugins/Unity.Localization",
+"unity.build.data": "https://github.com/liuwenjiexx/Unity.Build.Data.git?path=/Assets/Plugins/Unity.Build.Data"
+```
+
+
 
 
 
@@ -28,4 +40,4 @@ Unity Package
 
 
 
-[更多介绍](Assets/README.md)
+## [更多介绍](Assets/README.md)
