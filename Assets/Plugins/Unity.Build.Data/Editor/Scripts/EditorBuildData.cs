@@ -7,7 +7,9 @@ using System.IO;
 using System.Text;
 using UnityEditor.Callbacks;
 using UnityEngine;
+#if __LOCALIZATION
 using UnityEngine.Localizations;
+#endif
 using Debug = UnityEngine.Debug;
 
 namespace UnityEditor.Build.Data
@@ -20,7 +22,6 @@ namespace UnityEditor.Build.Data
         public const int Build_MenuPriority = 21;
         public const int Settings_MenuPriority = Build_MenuPriority + 20;
         private static string packageDir;
-        private static LocalizationValues editorLocalizationValues;
 
         private static SettingsProvider<BuildDataConfig> settingsProvider;
 
@@ -59,6 +60,9 @@ namespace UnityEditor.Build.Data
             get => SettingsProvider.FilePath;
         }
 
+#if __LOCALIZATION
+
+        private static LocalizationValues editorLocalizationValues;
         public static LocalizationValues EditorLocalizationValues
         {
             get
@@ -68,7 +72,7 @@ namespace UnityEditor.Build.Data
                 return editorLocalizationValues;
             }
         }
-
+#endif
 
         static string ProgressBarTitle;
 
@@ -278,7 +282,8 @@ namespace UnityEditor.Build.Data
                         new DataRowConfig(){ Index=3,  Type= DataRowType.FieldType},
                         new DataRowConfig(){ Index=4,  Type= DataRowType.Keyword}
                     },
-                    Provider = "Build.Data.MSExcel.ExcelDataReader, Build.Data.Provider.MSExcel"
+                    Provider = "Build.Data.Provider.MiniExcel.MiniExcelDataReader, Build.Data.Provider.MiniExcel"
+                    //Provider = "Build.Data.MSExcel.ExcelDataReader, Build.Data.Provider.MSExcel"
                 },
                 OutputCode = new BuildCodeConfig
                 {

@@ -9,7 +9,8 @@ namespace Build.Data
         FieldType,
         [Obsolete]
         DefaultValue,
-        FieldDescription,
+        FieldSummary,
+        FieldDescription= FieldSummary,
         Keyword,
         Data,
         TableDescription,

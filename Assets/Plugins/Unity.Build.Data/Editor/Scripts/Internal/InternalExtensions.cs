@@ -30,6 +30,13 @@ namespace UnityEditor.Build.Data
             }
             return index;
         }
-   
+
+#if !__LOCALIZATION
+        internal static string Localization(this string text)
+        {
+            return text;
+        }
+#endif
+
     }
 }

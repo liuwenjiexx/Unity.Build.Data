@@ -4,15 +4,14 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{F7AB3FA4-82DF-4A8B-96D5-48F51F2B84FF}</ProjectGuid>
+    <ProjectGuid>{DDBB19A4-50E1-4962-91A3-F7E9349C8C61}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Build.Data</RootNamespace>
-    <AssemblyName>Build.Data.Config</AssemblyName>
+    <RootNamespace>Build.Data.Provider.MiniExcel</RootNamespace>
+    <AssemblyName>Build.Data.Provider.MiniExcel</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -22,7 +21,6 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -31,24 +29,43 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="MiniExcel, Version=1.34.2.0, Culture=neutral, PublicKeyToken=e7310002a53eac39, processorArchitecture=MSIL">
+      <HintPath>..\packages\MiniExcel.1.34.2\lib\net45\MiniExcel.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BuildCodeConfig.cs" />
-    <Compile Include="BuildDataConfig.cs" />
-    <Compile Include="DataRowConfig.cs" />
-    <Compile Include="InputDataConfig.cs" />
-    <Compile Include="OutputDataConfig.cs" />
-    <Compile Include="DataRowType.cs" />
+    <Compile Include="MiniExcelDataReader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Build.Data.Config\Build.Data.Config.csproj">
+      <Project>{f7ab3fa4-82df-4a8b-96d5-48f51f2b84ff}</Project>
+      <Name>Build.Data.Config</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\BuildData\BuildData.csproj">
+      <Project>{47e5b2db-be76-4ae2-a169-c257c71525d2}</Project>
+      <Name>BuildData</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy $(TargetPath) $(SolutionDir)\..\Assets\Plugins\Unity.Build.Data\Editor</PostBuildEvent>
+    <PreBuildEvent>copy $(TargetPath) $(SolutionDir)\..\Assets\Plugins\Unity.Build.Data\Editor
+copy $(TargetDir)MiniExcel.dll $(SolutionDir)\..\Assets\Plugins\Unity.Build.Data\Editor
+copy $(TargetPath) $(SolutionDir)\..\src\BuildData\bin\Debug
+copy $(TargetDir)MiniExcel.dll $(SolutionDir)\..\src\BuildData\bin\Debug</PreBuildEvent>
   </PropertyGroup>
 </Project>

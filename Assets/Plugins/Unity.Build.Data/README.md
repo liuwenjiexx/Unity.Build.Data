@@ -321,6 +321,9 @@ keyword([parameter])
    cd <Project Directory>
    "Packages/Unity.Build.Data/Editor/BuildData.exe" -code -data -config="ProjectSettings/Data.json"
    pause
+   
+   ```
+   
    ```
 
 
@@ -417,12 +420,34 @@ keyword([parameter])
 
 
 
+**默认实现**
+
+- `Build.Data.Provider.MiniExcel.MiniExcelDataReader, Build.Data.Provider.MiniExcel`
+
+基于  `MiniExcel` 实现
+
+- `Build.Data.MSExcel.ExcelDataReader, Build.Data.Provider.MSExcel`
+
+基于 `Microsoft.Office.Interop.Excel` 实现
+
+
+
+
+
 ### 扩展输出
 
 1. 继承输出数据 `DataWriter`
 2. 设置输出 `dll` 名称格式 `Build.Data.Provider.xxx.dll`
 3. 将 `dll` 放在 BuildData.exe 所在目录下
 4. 打开设置面板，`输出/提供程序` 下拉列表会显示新增的提供程序
+
+
+
+**默认实现**
+
+- `Build.Data.JsonDataWriter, BuildData`
+
+  输出 Json 格式
 
 
 

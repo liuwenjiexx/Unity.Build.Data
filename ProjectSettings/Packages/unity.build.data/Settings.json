@@ -1,6 +1,6 @@
 {
     "Input": {
-        "Provider": "Build.Data.MSExcel.ExcelDataReader, Build.Data.Provider.MSExcel",
+        "Provider": "Build.Data.Provider.MiniExcel.MiniExcelDataReader, Build.Data.Provider.MiniExcel",
         "Directory": "Data",
         "FileInclude": "\\.xlsx?$",
         "FileExclude": "~\\$",

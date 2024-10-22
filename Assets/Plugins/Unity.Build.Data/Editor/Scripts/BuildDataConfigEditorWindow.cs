@@ -7,8 +7,9 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using UnityEditor.GUIExtensions;
 using UnityEngine;
+#if __LOCALIZATION
 using UnityEngine.Localizations;
-
+#endif
 namespace UnityEditor.Build.Data
 {
     public class BuildDataConfigEditorWindow : EditorWindow
@@ -31,7 +32,9 @@ namespace UnityEditor.Build.Data
 
         private void OnEnable()
         {
+#if __LOCALIZATION
             using (EditorBuildData.EditorLocalizationValues.BeginScope())
+#endif
             {
                 titleContent = new GUIContent("Build Data Config".Localization());
             }
@@ -44,8 +47,9 @@ namespace UnityEditor.Build.Data
             BuildDataConfig config = Config;
             relativePath = Path.GetDirectoryName(config.FileName);
 
-
+#if __LOCALIZATION
             using (EditorBuildData.EditorLocalizationValues.BeginScope())
+#endif
             {
                 //    config.Enabled = EditorGUILayout.Toggle(new GUIContent("Enabled", "开启"), config.Enabled);
 
@@ -113,11 +117,12 @@ namespace UnityEditor.Build.Data
             GUILayout.Label("Input".Localization());
             using (new EditorGUILayoutx.Scopes.IndentLevelVerticalScope())
             {
-                using (new GUILayout.HorizontalScope())
-                {
-                    EditorGUILayout.PrefixLabel("Provider".Localization());
-                    inputConfig.Provider = EditorGUILayoutx.ProviderTypeName(inputConfig.Provider, EditorBuildData.PackageDir, "^Build\\.Data\\.Provider\\.(.*)\\.dll$|BuildData\\.exe", "Build.Data.DataReader");
-                }
+                //using (new GUILayout.HorizontalScope())
+                //{
+                //    EditorGUILayout.PrefixLabel("Provider".Localization());
+                //    inputConfig.Provider = EditorGUILayoutx.ProviderTypeName(inputConfig.Provider, EditorBuildData.PackageDir, "^Build\\.Data\\.Provider\\.(.*)\\.dll$|BuildData\\.exe", "Build.Data.DataReader");
+                //}
+                inputConfig.Provider = EditorGUILayout.TextField(new GUIContent("Provider".Localization()), inputConfig.Provider ?? string.Empty);
 
                 inputConfig.Directory = new GUIContent("Directory".Localization(), "").FolderField(inputConfig.Directory, "Data Source Folder", relativePath: relativePath);
                 inputConfig.FileInclude = EditorGUILayout.TextField(new GUIContent("File Include".Localization(), "Regex, excel(\\.xlsx?$)"), inputConfig.FileInclude ?? string.Empty);
@@ -295,11 +300,12 @@ namespace UnityEditor.Build.Data
             EditorGUILayout.LabelField("Output".Localization());
             using (new EditorGUILayoutx.Scopes.IndentLevelVerticalScope())
             {
-                using (new GUILayout.HorizontalScope())
-                {
-                    EditorGUILayout.PrefixLabel("Provider".Localization());
-                    outputConfig.Provider = EditorGUILayoutx.ProviderTypeName(outputConfig.Provider, EditorBuildData.PackageDir, "^Build\\.Data\\.Provider\\.(.*)\\.dll$|BuildData\\.exe", "Build.Data.DataWriter");
-                }
+                //using (new GUILayout.HorizontalScope())
+                //{
+                //    EditorGUILayout.PrefixLabel("Provider".Localization());
+                //    outputConfig.Provider = EditorGUILayoutx.ProviderTypeName(outputConfig.Provider, EditorBuildData.PackageDir, "^Build\\.Data\\.Provider\\.(.*)\\.dll$|BuildData\\.exe", "Build.Data.DataWriter");
+                //}
+                outputConfig.Provider = EditorGUILayout.TextField(new GUIContent("Provider".Localization()), outputConfig.Provider ?? string.Empty);
 
                 outputConfig.Path = new GUIContent("Path".Localization(), "").FolderField(outputConfig.Path ?? string.Empty, "Output Data Folder", relativePath: relativePath);
                 int oldIndentLevel;
@@ -337,7 +343,7 @@ namespace UnityEditor.Build.Data
             }
         }
 
-         
+
 
         void Save()
         {
