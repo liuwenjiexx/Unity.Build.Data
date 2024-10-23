@@ -14,25 +14,25 @@
         "Rows": [
             {
                 "Type": 4,
-                "Index": 1,
+                "Index": 0,
                 "Pattern": "",
                 "ValuePattern": ""
             },
             {
                 "Type": 1,
-                "Index": 2,
+                "Index": 1,
                 "Pattern": "",
                 "ValuePattern": ""
             },
             {
                 "Type": 2,
-                "Index": 3,
+                "Index": 2,
                 "Pattern": "",
                 "ValuePattern": ""
             },
             {
                 "Type": 5,
-                "Index": 4,
+                "Index": 3,
                 "Pattern": "",
                 "ValuePattern": ""
             }

@@ -124,18 +124,18 @@ namespace Build.Data.Provider.MiniExcel
             nameRow = tableConfig.FindRow(DataRowType.FieldName);
             ignoreColumnRow = tableConfig.FindRow(DataRowType.Exclude);
             fieldTypeRow = tableConfig.FindRow(DataRowType.FieldType);
-            fieldDescRow = tableConfig.FindRow(DataRowType.FieldDescription);
+            fieldDescRow = tableConfig.FindRow(DataRowType.FieldSummary);
             defaultValueRow = tableConfig.FindRow(DataRowType.DefaultValue);
             fieldDefRow = tableConfig.FindRow(DataRowType.Keyword);
 
 
-            var rowConfigs = tableConfig.Rows.Where(o => o.Index >= 1).ToList();
+            var rowConfigs = tableConfig.Rows.Where(o => o.Index >= 0).ToList();
             Dictionary<int, string[]> rowDatas = new Dictionary<int, string[]>();
             string[] keys = null;
             string[] values;
             foreach (IDictionary<string, object> row in rows)
             {
-                var rowConfig = rowConfigs.FirstOrDefault(o => (o.Index - 1) == rowIndex);
+                var rowConfig = rowConfigs.FirstOrDefault(o => o.Index == rowIndex);
                 if (isFirst)
                 {
                     isFirst = false;
@@ -147,13 +147,17 @@ namespace Build.Data.Provider.MiniExcel
                         Console.WriteLine("ignore");
                         return null;
                     }
+                    //keys 为第一行
+                    if (rowConfig != null)
+                    {
+                        values = new string[columnCount];
+                        Array.Copy(keys, values, values.Length);
+                        rowDatas[rowConfig.Index] = values;
+                        rowConfigs.Remove(rowConfig);
+                    }
 
-                    values = new string[columnCount];
-                    Array.Copy(keys, values, values.Length);
-                    rowDatas[rowConfig.Index - 1] = values;
-                    rowConfigs.Remove(rowConfig);
                     rowIndex++;
-                    rowConfig = rowConfigs.FirstOrDefault(o => (o.Index - 1) == rowIndex);
+                    rowConfig = rowConfigs.FirstOrDefault(o => o.Index == rowIndex);
                 }
 
 
@@ -165,7 +169,7 @@ namespace Build.Data.Provider.MiniExcel
                     {
                         values[i] = Convert.ToString(row[keys[i]]);
                     }
-                    rowDatas[rowConfig.Index - 1] = values;
+                    rowDatas[rowConfig.Index] = values;
                     rowConfigs.Remove(rowConfig);
 
                 }
@@ -180,16 +184,16 @@ namespace Build.Data.Provider.MiniExcel
             List<DataFieldInfo> fields = new List<DataFieldInfo>();
             int fieldNameRowIndex, fieldTypeRowIndex, fieldDescRowIndex, defaultValueRowIndex, fieldDefRowIndex;
 
+             
+            fieldNameRowIndex = nameRow == null ? -1 : nameRow.Index;
+            fieldTypeRowIndex = fieldTypeRow == null ? -1 : fieldTypeRow.Index;
+            fieldDescRowIndex = fieldDescRow == null ? -1 : fieldDescRow.Index;
+            defaultValueRowIndex = defaultValueRow == null ? -1 : defaultValueRow.Index;
+            fieldDefRowIndex = fieldDefRow == null ? -1 : fieldDefRow.Index;
 
-            fieldNameRowIndex = nameRow == null ? -1 : nameRow.Index - 1;
-            fieldTypeRowIndex = fieldTypeRow == null ? -1 : fieldTypeRow.Index - 1;
-            fieldDescRowIndex = fieldDescRow == null ? -1 : fieldDescRow.Index - 1;
-            defaultValueRowIndex = defaultValueRow == null ? -1 : defaultValueRow.Index - 1;
-            fieldDefRowIndex = fieldDefRow == null ? -1 : fieldDefRow.Index - 1;
-
-            if (fieldNameRowIndex <= 0)
+            if (fieldNameRowIndex < 0)
             {
-                Console.WriteLine("not found field name row");
+                Console.WriteLine("not found [field name] row");
                 return null;
             }
 
@@ -198,12 +202,8 @@ namespace Build.Data.Provider.MiniExcel
 
             for (int i = tableConfig.OffsetColumn; i < columnCount; i++)
             {
-
-                if (!rowDatas.TryGetValue(fieldNameRowIndex, out values))
-                {
-                    Console.WriteLine("requrie field name row");
-                    return null;
-                }
+                values = rowDatas[fieldNameRowIndex];
+     
                 string fieldName = GetStringPatternResult(values[i], nameRow.ValuePattern);
                 if (string.IsNullOrEmpty(fieldName))
                 {
@@ -290,9 +290,9 @@ namespace Build.Data.Provider.MiniExcel
             int dataColumnStartIndex = tableConfig.OffsetColumn;
             int dataRowIndex = -1;
             var dataRow = tableConfig.FindRow(DataRowType.Data);
-            if (dataRow == null || dataRow.Index < 1)
+            if (dataRow == null || dataRow.Index < 0)
             {
-                dataRowIndex = tableConfig.Rows.Max(o => o.Index - 1) + 1;
+                dataRowIndex = tableConfig.Rows.Max(o => o.Index) + 1;
             }
             var cacheSheet = tableNameToSheet[tableName];
 

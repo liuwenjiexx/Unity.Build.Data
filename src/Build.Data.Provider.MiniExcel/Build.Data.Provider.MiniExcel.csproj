@@ -63,9 +63,14 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>copy $(TargetPath) $(SolutionDir)\..\Assets\Plugins\Unity.Build.Data\Editor
+    <PreBuildEvent>
+    </PreBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PostBuildEvent>copy $(TargetPath) $(SolutionDir)\..\Assets\Plugins\Unity.Build.Data\Editor
 copy $(TargetDir)MiniExcel.dll $(SolutionDir)\..\Assets\Plugins\Unity.Build.Data\Editor
 copy $(TargetPath) $(SolutionDir)\..\src\BuildData\bin\Debug
-copy $(TargetDir)MiniExcel.dll $(SolutionDir)\..\src\BuildData\bin\Debug</PreBuildEvent>
+copy $(TargetDir)$(TargetName).pdb $(SolutionDir)\..\src\BuildData\bin\Debug
+copy $(TargetDir)MiniExcel.dll $(SolutionDir)\..\src\BuildData\bin\Debug</PostBuildEvent>
   </PropertyGroup>
 </Project>

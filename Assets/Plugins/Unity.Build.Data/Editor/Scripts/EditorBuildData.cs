@@ -277,10 +277,10 @@ namespace UnityEditor.Build.Data
                     FileExclude = "~\\$",
                     Rows = new DataRowConfig[]
                     {
-                        new DataRowConfig(){ Index=1,  Type= DataRowType.FieldSummary},
-                        new DataRowConfig(){ Index=2,  Type= DataRowType.FieldName},
-                        new DataRowConfig(){ Index=3,  Type= DataRowType.FieldType},
-                        new DataRowConfig(){ Index=4,  Type= DataRowType.Keyword}
+                        new DataRowConfig(){ Index=0,  Type= DataRowType.FieldSummary},
+                        new DataRowConfig(){ Index=1,  Type= DataRowType.FieldName},
+                        new DataRowConfig(){ Index=2,  Type= DataRowType.FieldType},
+                        new DataRowConfig(){ Index=3,  Type= DataRowType.Keyword}
                     },
                     Provider = "Build.Data.Provider.MiniExcel.MiniExcelDataReader, Build.Data.Provider.MiniExcel"
                     //Provider = "Build.Data.MSExcel.ExcelDataReader, Build.Data.Provider.MSExcel"

@@ -39,7 +39,7 @@ namespace Build.Data
         {
             DataFieldInfo c;
             if (!TryGetColumn(name, out c))
-                throw new Exception("not found column " + name);
+                throw new Exception($"Table [{Name}] not found column [{name}]");
             return c;
         }
 
@@ -48,7 +48,10 @@ namespace Build.Data
             Parameters["TableName"] = Name;
         }
 
-
+        public override string ToString()
+        {
+            return $"Table: {Name}";
+        }
     }
 
     public class DataFieldInfo
@@ -94,7 +97,10 @@ namespace Build.Data
         {
 
         }
-   
+        public override string ToString()
+        {
+            return $"Field: {Name} - {DataTypeName}";
+        }
     }
 
 

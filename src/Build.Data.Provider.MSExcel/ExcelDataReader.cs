@@ -283,7 +283,7 @@ namespace Build.Data.MSExcel
             if (index < 0)
             {
                 if (rowType == DataRowType.Data)
-                    index = tableConfig.Rows.Max(o => o.Index) + 1;
+                    index = tableConfig.Rows.Max(o => o.Index)+1 + 1;
             }
             return index;
         }
@@ -292,8 +292,8 @@ namespace Build.Data.MSExcel
         {
             if (rowConfig == null)
                 return -1;
-            if (rowConfig.Index > 0)
-                return rowConfig.Index;
+            if (rowConfig.Index >= 0)
+                return rowConfig.Index+1;
 
             if (!string.IsNullOrEmpty(rowConfig.Pattern))
             {
@@ -442,7 +442,7 @@ namespace Build.Data.MSExcel
                 Console.WriteLine("not found field name row");
                 return null;
             }
-            DataRowConfig nameRow, ignoreColumnRow, fieldTypeRow, fieldDescRow, defaultValueRow, dataRow, fieldDefRow;
+            DataRowConfig nameRow, ignoreColumnRow, fieldTypeRow, fieldDescRow, defaultValueRow,  fieldDefRow;
             nameRow = tableConfig.FindRow(DataRowType.FieldName);
             ignoreColumnRow = tableConfig.FindRow(DataRowType.Exclude);
             fieldTypeRow = tableConfig.FindRow(DataRowType.FieldType);
@@ -450,15 +450,7 @@ namespace Build.Data.MSExcel
             defaultValueRow = tableConfig.FindRow(DataRowType.DefaultValue);
             fieldDefRow = tableConfig.FindRow(DataRowType.Keyword);
 
-            dataRow = tableConfig.FindRow(DataRowType.Data);
-            if (dataRow == null)
-            {
-                dataRow = new DataRowConfig()
-                {
-                    Type = DataRowType.Data,
-                    Index = tableConfig.Rows.Max(o => o.Index) + 1
-                };
-            }
+           
 
             for (int i = 1 + tableConfig.OffsetColumn; i <= columnCount; i++)
             {

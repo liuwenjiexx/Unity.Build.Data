@@ -28,6 +28,11 @@ namespace Build.Data
             this.Type = rowType;
             this.Pattern = rowPattern;
         }
+
+        public override string ToString()
+        {
+            return $"{Type} Row Index: {Index}";
+        }
     }
 
 }
