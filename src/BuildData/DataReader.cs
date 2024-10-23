@@ -4,6 +4,7 @@ using System;
 using System.CodeDom.Compiler;
 using System.Collections;
 using System.Collections.Generic;
+using System.Configuration.Assemblies;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -289,7 +290,7 @@ namespace Build.Data
                     separators = ArraySeparators;
                 }
                 if (index >= separators.Length)
-                    throw new Exception($"separator depth overflow, array depth <{ arrayDepth}>,  length <{ separators.Length}>");
+                    throw new Exception($"separator depth overflow, array depth <{arrayDepth}>,  length <{separators.Length}>");
             }
             else
             {
@@ -299,7 +300,7 @@ namespace Build.Data
                     separators = ObjectSeparators;
                 }
                 if (index >= separators.Length)
-                    throw new Exception($"separator depth overflow, object depth <{objectDepth}>, length <{ separators.Length}>");
+                    throw new Exception($"separator depth overflow, object depth <{objectDepth}>, length <{separators.Length}>");
             }
 
 
@@ -719,18 +720,38 @@ namespace Build.Data
 
             Assembly assembly = null;
 
-            if (!string.IsNullOrEmpty(config.OutputCode.Path))
+            if (string.IsNullOrEmpty(config.OutputCode.assemblyName))
             {
-                if (Path.GetExtension(config.OutputCode.Path).ToLower() == ".dll")
+                throw new Exception("Assembly Name empty");
+            }
+
+            if (config.OutputCode.format == CodeFormat.Assembly)
+            {
+                if (string.IsNullOrEmpty(config.OutputCode.outputDir))
                 {
-                    string assemblyPath =Path.GetFullPath(config.OutputCode.Path);
-                    CheckFilePath(assemblyPath);
+                    throw new Exception("code outputDir empty");
+                }
+                string assemblyPath = Path.GetFullPath(Path.Combine(config.OutputCode.outputDir, $"{config.OutputCode.assemblyName}.dll"));
+                CheckFilePath(assemblyPath);
+                assembly = Assembly.LoadFile(assemblyPath);
+            }
+            else if (!string.IsNullOrEmpty(BuildOptions.instance.tmpAssemblyPath))
+            {
+                assembly = Assembly.LoadFile(BuildOptions.instance.tmpAssemblyPath);
+            }
+            else
+            {
+                string assemblyPath = Path.Combine("Library/ScriptAssemblies", $"{config.OutputCode.assemblyName}.dll");
+                assemblyPath = Path.GetFullPath(assemblyPath);
+                if (File.Exists(assemblyPath))
+                {
                     assembly = Assembly.LoadFile(assemblyPath);
                 }
             }
 
             if (assembly == null)
-                throw new Exception("Assembly null");
+                throw new Exception($"Assembly [{config.OutputCode.assemblyName}] null");
+            Console.WriteLine($"Use metadata assembly: {assembly.Location}");
             allTypes = assembly.GetTypes();
 
             allTypeToDataTables = new Dictionary<Type, DataTableInfo>();

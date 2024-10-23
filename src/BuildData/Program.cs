@@ -43,6 +43,7 @@ namespace Build.Data
                 {
                     config = config
                 };
+                BuildOptions.instance= options;
 
                 if (argDic.ContainsKey("-code"))
                 {
@@ -51,6 +52,10 @@ namespace Build.Data
                 if (argDic.ContainsKey("-data"))
                 {
                     options.buildData = true;
+                }
+                if (argDic.ContainsKey("-code-tpl"))
+                {
+                    options.codeTpl = argDic["-code-tpl"];
                 }
                 BuildDataUtility.Build(options);
             }

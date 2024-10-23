@@ -287,8 +287,11 @@ namespace UnityEditor.Build.Data
                 },
                 OutputCode = new BuildCodeConfig
                 {
-                    Path = "Assets/Plugins/gen/Data.dll",
-                    TypeName = "DATA_{$TableName}"
+                    outputDir = "Assets/Plugins/gen/Data",
+                    assemblyName = "Data",
+                    TypeName = "DATA_{$TableName}",
+                    template = "Template/gen_code_tpl.xslt",
+                    format = CodeFormat.Asmdef,
                 },
                 Output = new OutputDataConfig()
                 {

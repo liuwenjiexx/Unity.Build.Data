@@ -288,9 +288,14 @@ namespace UnityEditor.Build.Data
         {
             EditorGUILayout.LabelField("Generate Code".Localization());
             EditorGUI.indentLevel++;
-            codeConfig.Path = new GUIContent("Path".Localization(), "").FileField(codeConfig.Path ?? string.Empty, "dll", "Build Code File", relativePath: relativePath);
+            codeConfig.outputDir = EditorGUILayout.TextField(new GUIContent("OutputDir".Localization()), codeConfig.outputDir ?? string.Empty);
+            //codeConfig.outputDir = new GUIContent("OutputDir".Localization(), "").FileField(codeConfig.outputDir ?? string.Empty, "dll", "Build Code File", relativePath: relativePath);
+            codeConfig.assemblyName = EditorGUILayout.TextField(new GUIContent("Assembly Name".Localization()), codeConfig.assemblyName ?? string.Empty);
             codeConfig.Namespace = EditorGUILayout.TextField(new GUIContent("Namespace".Localization()), codeConfig.Namespace ?? string.Empty);
             codeConfig.TypeName = EditorGUILayout.TextField(new GUIContent("TypeName".Localization()), codeConfig.TypeName ?? string.Empty);
+            codeConfig.template = EditorGUILayout.TextField(new GUIContent("Template".Localization()), codeConfig.template ?? string.Empty);
+            codeConfig.format = (CodeFormat)EditorGUILayout.EnumPopup(new GUIContent("Format".Localization()), codeConfig.format);
+            codeConfig.genIndexerClass = EditorGUILayout.Toggle("Indexer Class".Localization(), codeConfig.genIndexerClass);
             EditorGUI.indentLevel--;
         }
 

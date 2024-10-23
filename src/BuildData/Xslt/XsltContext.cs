@@ -7,6 +7,10 @@ namespace Template.Xslt
     public class XsltContext
     {
         private const string NS = "";
+        /// <summary>
+        /// <xsl:param name="Variable"/>
+        ///  <xsl:value-of select = "$Variable" />
+        /// </summary>
         public XsltArgumentList xsltArgList = new XsltArgumentList();
 
         public string OutputPath

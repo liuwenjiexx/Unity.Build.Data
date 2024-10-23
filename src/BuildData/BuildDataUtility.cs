@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Web.Script.Serialization;
@@ -23,7 +24,7 @@ namespace Build.Data
             Console.WriteLine("load config: " + configFile);
             configFile = Path.GetFullPath(configFile);
             if (!File.Exists(configFile))
-                throw new Exception($"config file not exists: <{ configFile}>");
+                throw new Exception($"config file not exists: <{configFile}>");
 
             string jsonString;
             jsonString = File.ReadAllText(configFile, Encoding.UTF8);
@@ -124,158 +125,361 @@ namespace Build.Data
             Console.WriteLine();
             Console.WriteLine("*** Build Code Begin ***");
             DateTime startTime = DateTime.Now;
-
-            XmlDocument doc = new XmlDocument();
-            XmlNode rootNode = doc.CreateElement("Root");
-            XmlAttribute attr;
-
-            attr = doc.CreateAttribute("Output");
-
-            string output = options.config.OutputCode.Path;
-            output = Path.GetFullPath(output);
-            attr.Value = output;
-            rootNode.Attributes.Append(attr);
-            IDictionary<string, object> configFormatValues = new HierarchyDictionary<string, object>();
-
-
-
-            foreach (var tableInfo in reader.DataTableInfos)
-            {
-                //  WorkbookItem item = reader.tableNameToWorkbook[tableInfo.Name];
-
-
-                XmlNode typeNode = doc.CreateElement("Type");
-                attr = doc.CreateAttribute("Name");
-                attr.Value = reader.TableNameToTypeName(tableInfo.Name);
-                typeNode.Attributes.Append(attr);
-
-                attr = doc.CreateAttribute("Type");
-                if ((tableInfo.Flags & DataTableFlags.Struct) == DataTableFlags.Struct)
-                    attr.Value = "Struct";
-                else if ((tableInfo.Flags & DataTableFlags.Enum) == DataTableFlags.Enum)
-                    attr.Value = "Enum";
-                else
-                    attr.Value = "Class";
-
-                typeNode.Attributes.Append(attr);
-
-                attr = doc.CreateAttribute("Namespace");
-                attr.Value = options.config.OutputCode.Namespace;
-                typeNode.Attributes.Append(attr);
-
-                if (!((tableInfo.Flags & DataTableFlags.Enum) == DataTableFlags.Enum))
-                {
-
-                    foreach (var col in tableInfo.Columns)
-                    {
-                        XmlNode fieldNode = doc.CreateElement("Field");
-
-                        attr = doc.CreateAttribute("Name");
-                        attr.Value = col.Name;
-                        fieldNode.Attributes.Append(attr);
-
-                        attr = doc.CreateAttribute("Type");
-                        if (col.DataType != null)
-                        {
-                            attr.Value = col.DataType.FullName;
-                        }
-                        else
-                        {
-                            attr.Value = reader.TableNameToTypeName(col.DataTypeName);
-                        }
-                        fieldNode.Attributes.Append(attr);
-
-                        attr = doc.CreateAttribute("Description");
-                        attr.Value = ReplaceSafeChar(col.Description);
-                        fieldNode.Attributes.Append(attr);
-
-                        attr = doc.CreateAttribute("Key");
-                        attr.Value = col.IsKey.ToString();
-                        fieldNode.Attributes.Append(attr);
-
-                        typeNode.AppendChild(fieldNode);
-                    }
-                }
-                else
-                {
-                    var colName = tableInfo.GetColumn("Name");
-                    var colValue = tableInfo.GetColumn("Value");
-
-                    foreach (EnumValue row in reader.LoadDataObjects(tableInfo.Name, typeof(EnumValue)))
-                    {
-                        XmlNode fieldNode = doc.CreateElement("Enum");
-
-                        attr = doc.CreateAttribute("Name");
-                        attr.Value = row.Name;
-                        fieldNode.Attributes.Append(attr);
-
-                        attr = doc.CreateAttribute("Type");
-                        attr.Value = colName.DataType.FullName;
-                        fieldNode.Attributes.Append(attr);
-
-                        if (!string.IsNullOrEmpty(row.Description))
-                        {
-                            attr = doc.CreateAttribute("Description");
-                            attr.Value = ReplaceSafeChar(row.Description);
-                            fieldNode.Attributes.Append(attr);
-                        }
-
-                        attr = doc.CreateAttribute("Value");
-                        attr.Value = reader.ChangeType(row.Value, colValue.DataType).ToStringOrNulll();
-                        fieldNode.Attributes.Append(attr);
-
-                        typeNode.AppendChild(fieldNode);
-                    }
-                }
-
-                rootNode.AppendChild(typeNode);
-            }
-
-
-            doc.AppendChild(rootNode);
-
-            //string tplPath = config.Base.ExportCodeTpl;
-            //if (!Path.IsPathRooted(tplPath))
-            //    tplPath = Path.Combine(baseDir, tplPath);
-
             bool isOutputDll = false;
             string outputCodeFile;
-
-            if (Path.GetExtension(output).ToLower() == ".dll")
+            string outputCodeDir;
+            string tmpCodeDir = Path.GetFullPath("Temp/gen/Data");
+            string tmpAssemblyPath = Path.Combine(tmpCodeDir, $"{options.config.OutputCode.assemblyName}.dll");
+            if (options.config.OutputCode.format == CodeFormat.Assembly)
             {
                 isOutputDll = true;
-                outputCodeFile = Path.Combine("Temp/gen/Data", Path.GetFileNameWithoutExtension(output) + ".cs");
-                outputCodeFile = Path.GetFullPath(outputCodeFile);
+
+            }
+
+            outputCodeDir = Path.GetFullPath(options.config.OutputCode.outputDir);
+            string assemblyPath = Path.Combine(outputCodeDir, $"{options.config.OutputCode.assemblyName}.dll");
+            string asmdefPath = Path.Combine(outputCodeDir, $"{options.config.OutputCode.assemblyName}.asmdef");
+
+            XsltTemplate tpl = new XsltTemplate();
+            tpl.Variables["IndexerClass"] = options.config.OutputCode.genIndexerClass.ToString().ToLower();
+
+            var ass = typeof(DataReader).Assembly;
+            string codeTpl = null;
+            string codeTplPath = null;
+            if (!string.IsNullOrEmpty(options.codeTpl))
+            {
+                codeTpl = options.codeTpl;
             }
             else
             {
-                outputCodeFile = output;
+                codeTpl = options.config.OutputCode.template;
             }
+            if (string.IsNullOrEmpty(codeTpl))
+                throw new Exception("Code template empty");
+            if (Path.IsPathRooted(codeTpl))
+            {
+                codeTplPath = codeTpl;
+            }
+            if (string.IsNullOrEmpty(codeTplPath))
+            {
+                codeTplPath = Path.Combine(Path.GetDirectoryName(typeof(BuildDataUtility).Assembly.Location), codeTpl);
+                if (!File.Exists(codeTplPath))
+                {
+                    codeTplPath = null;
+                }
+            }
+            if (string.IsNullOrEmpty(codeTplPath))
+            {
+                if (File.Exists(codeTpl))
+                {
+                    codeTplPath = codeTpl;
+                }
+            }
+            if (string.IsNullOrEmpty(codeTplPath))
+                throw new Exception("not exists code template file");
 
-
-            XsltTemplate tpl = new XsltTemplate();
-            tpl.Variables["OutputPath"] = outputCodeFile;
-            var ass = typeof(DataReader).Assembly;
-            var tplSteam = ass.GetManifestResourceStream("Build.Data.Template.code_tpl.xslt");
-            if (tplSteam == null)
-                throw new Exception("not exists " + "BuildData.Template.code_tpl.xslt");
-            using (StreamReader sr = new StreamReader(tplSteam))
+            codeTplPath = Path.GetFullPath(codeTplPath);
+            List<string> codeFiles = new List<string>();
+            using (StreamReader sr = new StreamReader(codeTplPath))
             {
                 string xslXml = sr.ReadToEnd();
                 tpl.LoadXslXml(xslXml);
 
-                string[] codeFiles = tpl.Transform(doc);
 
-                if (isOutputDll)
+                XmlDocument doc = new XmlDocument();
+                XmlNode rootNode = doc.CreateElement("Assembly");
+
+                doc.AppendChild(rootNode);
+                XmlAttribute attr;
+
+
+                attr = doc.CreateAttribute("Name");
+                attr.Value = options.config.OutputCode.assemblyName;
+                rootNode.Attributes.Append(attr);
+
+
+                attr = doc.CreateAttribute("First");
+                attr.Value = "true";
+                rootNode.Attributes.Append(attr);
+
+                IDictionary<string, object> configFormatValues = new HierarchyDictionary<string, object>();
+
+                int index = 0;
+
+                if (isOutputDll || options.buildData)
                 {
-                    CompilerCode(output, codeFiles);
+                    codeFiles.Clear();
+                    foreach (var tableInfo in reader.DataTableInfos)
+                    {
+                        var typeNode = TableToTypeNode(options, reader, tableInfo, doc);
+
+                        rootNode.AppendChild(typeNode);
+                    }
+
+                    outputCodeFile = Path.Combine(tmpCodeDir, $"{options.config.OutputCode.assemblyName}.cs");
+                    outputCodeFile = Path.GetFullPath(outputCodeFile);
+                    tpl.Variables["OutputPath"] = outputCodeFile;
+                    tpl.Variables["first"] = "true";
+                    string[] files = tpl.Transform(doc);
+                    foreach (var codeFile in files)
+                    {
+                        string file = codeFile.Replace("\\", "/");
+                        Console.WriteLine($"Gen code file: {file}");
+                        codeFiles.Add(file);
+                    }
+                    //清理代码文件
+                    if (Directory.Exists(tmpCodeDir))
+                    {
+                        foreach (var file in Directory.GetFiles(tmpCodeDir, "*.cs", SearchOption.AllDirectories).Select(o => o.Replace("\\", "/")))
+                        {
+                            if (file.EndsWith(".cs"))
+                            {
+                                if (!codeFiles.Contains(file))
+                                {
+                                    File.Delete(file);
+                                    Console.WriteLine($"delete file: {file}");
+                                }
+                            }
+                        }
+                    }
+
+                    if (File.Exists(tmpAssemblyPath))
+                        File.Delete(tmpAssemblyPath);
+
+                    CompilerCode(tmpAssemblyPath, codeFiles.ToArray());
+
+                    if (File.Exists(tmpAssemblyPath))
+                    {
+                        options.tmpAssemblyPath = tmpAssemblyPath;
+                    }
+
+                    if (options.config.OutputCode.format == CodeFormat.Assembly)
+                    {
+                        Directory.CreateDirectory(Path.GetDirectoryName(assemblyPath));
+                        File.Copy(tmpAssemblyPath, assemblyPath, true);
+
+                        string path1 = Path.Combine(Path.GetDirectoryName(tmpAssemblyPath), Path.GetFileNameWithoutExtension(tmpAssemblyPath) + ".xml");
+                        if (File.Exists(path1))
+                        {
+                            File.Copy(path1, Path.Combine(outputCodeDir, options.config.OutputCode.assemblyName + ".xml"));
+                        }
+                    }
                 }
+
+                if (options.config.OutputCode.format == CodeFormat.Code || options.config.OutputCode.format == CodeFormat.Asmdef)
+                {
+                    codeFiles.Clear();
+                    index = 0;
+                    foreach (var tableInfo in reader.DataTableInfos)
+                    {
+
+                        while (rootNode.ChildNodes.Count > 0)
+                        {
+                            rootNode.RemoveChild(rootNode.ChildNodes[0]);
+                        }
+
+                        if (index != 0)
+                        {
+                            tpl.Variables["first"] = "false";
+                        }
+                        else
+                        {
+                            tpl.Variables["first"] = "true";
+                        }
+
+                        var typeNode = TableToTypeNode(options, reader, tableInfo, doc);
+
+                        rootNode.AppendChild(typeNode);
+                        string typeName = typeNode.Attributes["Name"].Value;
+
+                        string codeFilePath = Path.Combine(outputCodeDir, $"{typeName}.cs");
+                        tpl.Variables["OutputPath"] = codeFilePath;
+                        string[] files = tpl.Transform(doc);
+                        foreach (var codeFile in files)
+                        {
+                            string file = codeFile.Replace("\\", "/");
+                            Console.WriteLine($"Gen code file: {file}");
+                            codeFiles.Add(file);
+                        }
+
+                        index++;
+
+                    }
+
+                    //清理代码文件
+                    if (Directory.Exists(outputCodeDir))
+                    {
+                        foreach (var file in Directory.GetFiles(outputCodeDir, "*.cs", SearchOption.TopDirectoryOnly).Select(o => o.Replace("\\", "/")))
+                        {
+                            if (file.EndsWith(".cs"))
+                            {
+                                if (!codeFiles.Contains(file))
+                                {
+                                    File.Delete(file);
+                                    Console.WriteLine($"delete file: {file}");
+                                }
+                            }
+                        }
+                    }
+
+                }
+
+                if (options.config.OutputCode.format == CodeFormat.Asmdef)
+                {
+                    if (!File.Exists(asmdefPath))
+                    {
+                        Asmdef asmdef = new Asmdef()
+                        {
+                            name = options.config.OutputCode.assemblyName
+                        };
+                        var serializer = new JavaScriptSerializer();
+                        var json = serializer.Serialize(asmdef);
+                        File.WriteAllText(asmdefPath, json, Encoding.UTF8);
+                    }
+                }
+
+                if (!(options.config.OutputCode.format == CodeFormat.Code || options.config.OutputCode.format == CodeFormat.Asmdef))
+                {
+                    foreach (var file in Directory.GetFiles(outputCodeDir, "*.cs", SearchOption.TopDirectoryOnly).Select(o => o.Replace("\\", "/")))
+                    {
+                        if (file.EndsWith(".cs"))
+                        {
+                            File.Delete(file);
+                            Console.WriteLine($"delete file: {file}");
+                        }
+                    }
+                }
+
+                if (options.config.OutputCode.format != CodeFormat.Assembly)
+                {
+                    //清理程序集
+                    if (File.Exists(assemblyPath))
+                    {
+                        File.Delete(assemblyPath);
+                        Console.WriteLine($"delete file: {assemblyPath}");
+                        string path1 = Path.Combine(Path.GetDirectoryName(assemblyPath), Path.GetFileNameWithoutExtension(assemblyPath) + ".xml");
+                        if (File.Exists(path1))
+                        {
+                            File.Delete(path1);
+                            Console.WriteLine($"delete file: {path1}");
+                        }
+                    }
+                }
+
+                if (options.config.OutputCode.format != CodeFormat.Asmdef)
+                {
+                    //清理 asmdef
+                    if (File.Exists(asmdefPath))
+                    {
+                        File.Delete(asmdefPath);
+                        Console.WriteLine($"delete file: {asmdefPath}");
+                    }
+                }
+                //string tplPath = config.Base.ExportCodeTpl;
+                //if (!Path.IsPathRooted(tplPath))
+                //    tplPath = Path.Combine(baseDir, tplPath);
+
+
             }
 
             var usedTime = (DateTime.Now - startTime).TotalSeconds;
             Console.WriteLine("*** Build Code End. time:{0:0.#}s ***", usedTime);
 
         }
+
+        static XmlNode TableToTypeNode(BuildOptions options, DataReader reader, DataTableInfo tableInfo, XmlDocument doc)
+        {
+            XmlAttribute attr;
+
+            string typeName;
+            XmlNode typeNode = doc.CreateElement("Type");
+            attr = doc.CreateAttribute("Name");
+            typeName = reader.TableNameToTypeName(tableInfo.Name);
+            attr.Value = typeName;
+            typeNode.Attributes.Append(attr);
+
+            attr = doc.CreateAttribute("Type");
+            if ((tableInfo.Flags & DataTableFlags.Struct) == DataTableFlags.Struct)
+                attr.Value = "Struct";
+            else if ((tableInfo.Flags & DataTableFlags.Enum) == DataTableFlags.Enum)
+                attr.Value = "Enum";
+            else
+                attr.Value = "Class";
+
+            typeNode.Attributes.Append(attr);
+
+            attr = doc.CreateAttribute("Namespace");
+            attr.Value = options.config.OutputCode.Namespace;
+            typeNode.Attributes.Append(attr);
+
+
+            if (!((tableInfo.Flags & DataTableFlags.Enum) == DataTableFlags.Enum))
+            {
+
+                foreach (var col in tableInfo.Columns)
+                {
+                    XmlNode fieldNode = doc.CreateElement("Field");
+
+                    attr = doc.CreateAttribute("Name");
+                    attr.Value = col.Name;
+                    fieldNode.Attributes.Append(attr);
+
+                    attr = doc.CreateAttribute("Type");
+                    if (col.DataType != null)
+                    {
+                        attr.Value = col.DataType.FullName;
+                    }
+                    else
+                    {
+                        attr.Value = reader.TableNameToTypeName(col.DataTypeName);
+                    }
+                    fieldNode.Attributes.Append(attr);
+
+                    attr = doc.CreateAttribute("Description");
+                    attr.Value = ReplaceSafeChar(col.Description);
+                    fieldNode.Attributes.Append(attr);
+
+                    attr = doc.CreateAttribute("Key");
+                    attr.Value = col.IsKey.ToString();
+                    fieldNode.Attributes.Append(attr);
+
+                    typeNode.AppendChild(fieldNode);
+                }
+            }
+            else
+            {
+                var colName = tableInfo.GetColumn("Name");
+                var colValue = tableInfo.GetColumn("Value");
+
+                foreach (EnumValue row in reader.LoadDataObjects(tableInfo.Name, typeof(EnumValue)))
+                {
+                    XmlNode fieldNode = doc.CreateElement("Enum");
+
+                    attr = doc.CreateAttribute("Name");
+                    attr.Value = row.Name;
+                    fieldNode.Attributes.Append(attr);
+
+                    attr = doc.CreateAttribute("Type");
+                    attr.Value = colName.DataType.FullName;
+                    fieldNode.Attributes.Append(attr);
+
+                    if (!string.IsNullOrEmpty(row.Description))
+                    {
+                        attr = doc.CreateAttribute("Description");
+                        attr.Value = ReplaceSafeChar(row.Description);
+                        fieldNode.Attributes.Append(attr);
+                    }
+
+                    attr = doc.CreateAttribute("Value");
+                    attr.Value = reader.ChangeType(row.Value, colValue.DataType).ToStringOrNulll();
+                    fieldNode.Attributes.Append(attr);
+
+                    typeNode.AppendChild(fieldNode);
+                }
+            }
+            return typeNode;
+        }
+
 
         class EnumValue
         {
@@ -284,7 +488,10 @@ namespace Build.Data
             public string Description;
         }
 
-
+        class Asmdef
+        {
+            public string name;
+        }
 
         public static bool CompilerCode(string outputPath, string[] codeFiles, string[] assemblies = null)
         {
@@ -318,10 +525,12 @@ namespace Build.Data
             }
 
             string srcFile;
-            srcFile = codeFiles[0];
-            srcFile = srcFile.Replace('/', '\\');
-
-            CompilerResults cr = cSharpCodePrivoder.CompileAssemblyFromFile(cp, srcFile);
+            string[] files = (string[])codeFiles.Clone();
+            for (int i = 0; i < files.Length; i++)
+            {
+                files[i] = files[i].Replace('/', '\\');
+            }
+            CompilerResults cr = cSharpCodePrivoder.CompileAssemblyFromFile(cp, files);
 
             if (cr.Errors.HasErrors)
             {
@@ -488,6 +697,9 @@ namespace Build.Data
         public BuildDataConfig config;
         public bool buildData;
         public bool buildCode;
+        public string codeTpl;
+        public string tmpAssemblyPath;
+        public static BuildOptions instance;
     }
 }
 

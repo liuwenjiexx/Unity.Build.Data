@@ -4,7 +4,8 @@
 >
   <xsl:output method="text" indent="yes"/>
   <xsl:key match="Type" use="@Namespace" name="NamespaceKey"/>
-
+	<xsl:param name="first"/>
+	<xsl:param name="IndexerClass"/>
   <xsl:template match="/">
     <!--<xsl:value-of select ="tpl:Set('OutputPath',@Output)"/>-->
 
@@ -14,8 +15,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 </xsl:text>
-    <xsl:call-template name="IndexerBaseClass"/>
-    <xsl:apply-templates />
+	<xsl:apply-templates />
+	<xsl:if test="$first = 'true' and $IndexerClass = 'true'">
+		<xsl:call-template name="IndexerBaseClass"/>
+	</xsl:if>
   </xsl:template>
 
   <xsl:template match="Type">
@@ -58,7 +61,7 @@ using System.Linq;
     }</xsl:text>
 
 
-    <xsl:for-each select="Field[@Key='True']">
+    <xsl:for-each select="Field[@Key='True' and $IndexerClass = 'true']">
       <xsl:call-template name="IndexerClass"/>
     </xsl:for-each>
 

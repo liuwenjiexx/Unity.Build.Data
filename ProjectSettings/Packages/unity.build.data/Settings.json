@@ -43,9 +43,13 @@
         "Path": "Assets/Resources/Data"
     },
     "OutputCode": {
-        "Path": "Assets/Plugins/gen/Data.dll",
+        "outputDir": "Assets/Plugins/gen/Data",
         "Namespace": "",
-        "TypeName": "DATA_{$TableName}"
+        "TypeName": "DATA_{$TableName}",
+        "assemblyName": "Data",
+        "format": 2,
+        "template": "Template/gen_code_tpl.xslt",
+        "genIndexerClass": true
     },
     "TypeMappings": []
 }
