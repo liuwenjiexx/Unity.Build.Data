@@ -175,7 +175,7 @@ namespace Build.Data
                         }
                         catch (Exception ex)
                         {
-                            throw new Exception($"ChangeType Error. row <{rowCount}> column <{column.Name}> index <{column.OriginIndex}> value <{value}> type <{member.ValueType}>", ex);
+                            throw new Exception($"ChangeType Error. table [{tableName}] row <{rowCount}> column <{column.Name}> index <{column.OriginIndex}> value <{value}> type <{member.ValueType}>", ex);
                         }
                     }
                     member.SetValue(obj, value);

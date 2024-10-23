@@ -85,6 +85,20 @@ namespace Build.Data.Provider.MiniExcel
             }
         }
 
+        bool IsEmptyRow(object[] values)
+        {
+            if (values == null || values.Length == 0) return true;
+            for (int i = 0; i < values.Length; i++)
+            {
+                var val = values[i];
+                if (!(val == null || object.Equals(val, string.Empty)))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
         DataTableInfo ParseDataTableInfo(string filePath, SheetInfo si)
         {
             Console.WriteLine($"load sheet <{si.Name}>");
@@ -184,7 +198,7 @@ namespace Build.Data.Provider.MiniExcel
             List<DataFieldInfo> fields = new List<DataFieldInfo>();
             int fieldNameRowIndex, fieldTypeRowIndex, fieldDescRowIndex, defaultValueRowIndex, fieldDefRowIndex;
 
-             
+
             fieldNameRowIndex = nameRow == null ? -1 : nameRow.Index;
             fieldTypeRowIndex = fieldTypeRow == null ? -1 : fieldTypeRow.Index;
             fieldDescRowIndex = fieldDescRow == null ? -1 : fieldDescRow.Index;
@@ -203,7 +217,7 @@ namespace Build.Data.Provider.MiniExcel
             for (int i = tableConfig.OffsetColumn; i < columnCount; i++)
             {
                 values = rowDatas[fieldNameRowIndex];
-     
+
                 string fieldName = GetStringPatternResult(values[i], nameRow.ValuePattern);
                 if (string.IsNullOrEmpty(fieldName))
                 {
@@ -316,10 +330,16 @@ namespace Build.Data.Provider.MiniExcel
                 {
                     values = new object[columns.Length];
 
+
                     for (int i = 0; i < columns.Length; i++)
                     {
                         var col = columns[i];
                         values[i] = row[keys[col.OriginIndex]];
+                    }
+
+                    if (IsEmptyRow(values))
+                    {
+                        break;
                     }
                     yield return values;
                 }

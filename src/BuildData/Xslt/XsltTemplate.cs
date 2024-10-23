@@ -124,6 +124,16 @@ namespace Template.Xslt
         string ResolveEditorFilePath(string baseDir, string path)
         {
             string filePath = null;
+
+            if (path.IndexOf("://") < 0)
+            {
+                if (Path.IsPathRooted(path))
+                    filePath = path;
+                else
+                    filePath = Path.Combine(baseDir, path);
+                return filePath;
+            }
+
             Uri uri = null;
             string scheme = null;
             try
@@ -134,10 +144,7 @@ namespace Template.Xslt
 
             if (uri == null)
             {
-                if (Path.IsPathRooted(path))
-                    filePath = path;
-                else
-                    filePath = Path.Combine(baseDir, path);
+                return Path.Combine(baseDir, path);  
             }
             else
             {

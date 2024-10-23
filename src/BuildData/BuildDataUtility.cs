@@ -137,6 +137,9 @@ namespace Build.Data
             }
 
             outputCodeDir = Path.GetFullPath(options.config.OutputCode.outputDir);
+           
+            Directory.CreateDirectory(outputCodeDir);
+            Directory.CreateDirectory(tmpCodeDir);
             string assemblyPath = Path.Combine(outputCodeDir, $"{options.config.OutputCode.assemblyName}.dll");
             string asmdefPath = Path.Combine(outputCodeDir, $"{options.config.OutputCode.assemblyName}.asmdef");
 
@@ -293,6 +296,7 @@ namespace Build.Data
                         string typeName = typeNode.Attributes["Name"].Value;
 
                         string codeFilePath = Path.Combine(outputCodeDir, $"{typeName}.cs");
+                     
                         tpl.Variables["OutputPath"] = codeFilePath;
                         string[] files = tpl.Transform(doc);
                         foreach (var codeFile in files)
