@@ -18,7 +18,7 @@ namespace UnityEditor.Build.Data
     public static class EditorBuildData
     {
         public const string PackageName = "unity.build.data";
-        public const string MenuPrefix = "Build/Data/";
+        public const string MenuPrefix = "Tools/Data/";
         public const int Build_MenuPriority = 21;
         public const int Settings_MenuPriority = Build_MenuPriority + 20;
         private static string packageDir;

@@ -14,7 +14,7 @@
 
 ## ﻿菜单
 
-菜单路径 Build/Data
+菜单路径 Tools/Data
 
 - **Build**
 
@@ -38,7 +38,7 @@
 
 1. ### 编辑配置
 
-   点击菜单 `Build/Data/Settings` 生成 `ProjectSettings/Data.json` 配置文件
+   点击菜单 `Tools/Data/Settings` 生成 `ProjectSettings/Data.json` 配置文件
 
    - 配置的路径都是相对于该配置文件目录位置
 
@@ -317,12 +317,10 @@ keyword([parameter])
 1. 新建空的批处理文件 `BuildData.bat`
 
 2. 添加以下内容
-	 	```bat
+```bat
    cd <Project Directory>
    "Packages/Unity.Build.Data/Editor/BuildData.exe" -code -data -config="ProjectSettings/Data.json"
    pause
-   
-   ```
    
    ```
 
